@@ -25,7 +25,7 @@ public class JedisLock extends AbstractRedisLock<JedisLock> {
     private final Supplier<Boolean> lockFunc = () -> {
         try (Jedis jedis = jedisPool.getResource()) {
             String value = lockValue == null ? lockValue = createLockValue() : lockValue;
-            String result = jedis.set(lockKey, value, SetParams.setParams().ex((int) expire).nx());
+            String result = jedis.set(lockKey, value, SetParams.setParams().px((int) expire).nx());
             if (REDIS_LOCK_OK.equals(result)) {
                 return super.afterLock();
             } else {
@@ -58,11 +58,6 @@ public class JedisLock extends AbstractRedisLock<JedisLock> {
             }
         }
     };
-
-    private List<String> toList(String... ss) {
-        return Arrays.stream(ss).collect(Collectors.toList());
-    }
-
 
     public JedisLock(String lockKey, JedisPool jedisPool) {
         super(lockKey);

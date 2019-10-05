@@ -4,10 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import static java.time.Instant.ofEpochMilli;
 import static java.time.LocalDateTime.ofInstant;
@@ -112,6 +115,10 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
         owner = null;
         expireTime = -1;
         return true;
+    }
+
+    protected List<String> toList(String... ss) {
+        return Arrays.stream(ss).collect(Collectors.toList());
     }
 
     /*************************************************************
