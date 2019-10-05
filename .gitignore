@@ -1,0 +1,20 @@
+# Project exclude paths
+/lock/base-lock/target/
+/lock/lock-redis/lock-jedis/target/
+
+.idea
+build/*
+target/*
+*.iml
+out/*
+*/target
+*/build
+*/*.iml
+classes/*
+/.gradle/
+*.ipr
+*.iws
+.DS_Store
+**/.DS_Store
+**/*.log
+**/.vscode
