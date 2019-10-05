@@ -3,19 +3,16 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>pub.tbc.dev.toolkit.lock</artifactId>
+        <artifactId>lock</artifactId>
         <groupId>pub.tbc</groupId>
         <version>1.0-SNAPSHOT</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>pub.tbc.dev.toolkit.lock-spring-boot-starter</artifactId>
+    <artifactId>lock-spring-boot-starter</artifactId>
 
     <dependencies>
-        <dependency>
-            <groupId></groupId>
-            <artifactId></artifactId>
-        </dependency>
+
     </dependencies>
 
 </project>

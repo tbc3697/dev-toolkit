@@ -9,12 +9,12 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>pub.tbc.dev.toolkit.lock</artifactId>
+    <artifactId>lock</artifactId>
     <packaging>pom</packaging>
     <modules>
-        <module>base-pub.tbc.dev.toolkit.lock</module>
-        <module>pub.tbc.dev.toolkit.lock-redis</module>
-        <module>pub.tbc.dev.toolkit.lock-spring-boot-starter</module>
+        <module>base-lock</module>
+        <module>lock-redis</module>
+        <module>lock-spring-boot-starter</module>
     </modules>
 
 
