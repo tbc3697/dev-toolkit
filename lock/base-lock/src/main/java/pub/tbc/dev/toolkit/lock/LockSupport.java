@@ -17,6 +17,8 @@ import java.util.function.Supplier;
 @RequiredArgsConstructor(staticName = "ofLock")
 public class LockSupport<T> {
 
+    private Supplier<T> DEFAULT_FAIL_SUPPLIER = toSupplier(() -> log.error("获取锁失败"));
+
     @NonNull
     private DistributeLock lock;
 
@@ -35,7 +37,7 @@ public class LockSupport<T> {
     }
 
     private T execFail() {
-        return failSupplier.get();
+        return failSupplier == null ? DEFAULT_FAIL_SUPPLIER.get() : failSupplier.get();
     }
 
     /**
@@ -151,6 +153,7 @@ public class LockSupport<T> {
         long endTime = System.currentTimeMillis() + waitingMilliseconds;
         return exec(() -> System.currentTimeMillis() < endTime);
     }
+
     public T ￥exec(long waitingMilliseconds) {
         long endTime = System.currentTimeMillis() + waitingMilliseconds;
         return exec(() -> System.currentTimeMillis() < endTime);
