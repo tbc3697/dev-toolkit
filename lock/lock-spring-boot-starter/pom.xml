@@ -12,7 +12,11 @@
     <artifactId>lock-spring-boot-starter</artifactId>
 
     <dependencies>
-
+        <dependency>
+            <groupId>pub.tbc</groupId>
+            <artifactId>lock-jedis</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
 </project>
