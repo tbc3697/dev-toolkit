@@ -25,8 +25,12 @@ String lockKey = "lock:key";
 DistributeLock lock = new JedisLock(lockKey, pool);
 LockSupport lockSupport = LockSupport.ofLock(lock)
     .ok(()->System.out.println("OK"))
-    .fail(()->System.out.println("FAIL")
-    .exec();
+    .fail(()->System.out.println("FAIL");
+
+// 只会获取一次锁
+lockSupport.exec();
+// 带超时时间，获取锁失败时，会在超时时间内多次重试
+loclSupport.exec(5_000);
 ```
 设置锁过期时间及自旋间隔时间等：
 ```
