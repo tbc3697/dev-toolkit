@@ -28,7 +28,7 @@ LockSupport lockSupport = LockSupport.ofLock(lock)
     .fail(()->System.out.println("FAIL")
     .exec();
 ```
-设置锁过期时间：
+设置锁过期时间及自旋间隔时间等：
 ```
 DistributeLock lock = new JedisLock("lock:key", jedisPool);
 
