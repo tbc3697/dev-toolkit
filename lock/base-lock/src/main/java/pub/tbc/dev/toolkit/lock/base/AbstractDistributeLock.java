@@ -42,6 +42,12 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     /** 默认时区：直接使用"GMT+8"，不用 ZoneId.systemDefault(); */
     private final ZoneId DEFAULT_ZONE = ZoneId.of("GMT+8");
 
+    /** 释放时，若失败，默认的最大重试次数 */
+    private final int DEFAULT_RELEASE_COUNT = 20;
+
+    /** 释放时，若失败，默认重试间隔（毫秒） */
+    private final int DEFAULT_RELEASE_INTERNAL = 50;
+
 
     /**
      * 变量
@@ -170,7 +176,10 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     public boolean tryLock() {
         // isLocked()方法若返回true，说明已经由当前进程内的某线程获取到了锁，反之则不一定确认锁空闲
         // 暂不支持重入
-        return isLocked() ? false : (isLocked = lockFunc().get());
+        if (isLocked() ? false : (isLocked = lockFunc().get())) {
+            return afterLock();
+        }
+        return false;
     }
 
     @Override
@@ -180,7 +189,11 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
             log.error("仅支持持有锁的线程释放");
             return false;
         }
-        return !(isLocked = !releaseFunc().get());
+        if (!(isLocked = !releaseFunc().get())) {
+            return afterRelease();
+        } else {
+            return false;
+        }
     }
 
     @Override
@@ -225,14 +238,37 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     public boolean tryLock(long millionSecond, long internal) throws InterruptedException {
         // 计算超时时间点
         long outTime = millionSecond + System.currentTimeMillis();
+        // 尝试次数
+        int count = 0;
         // 用 do while 循环，先快速尝试一次
         do {
+            count++;
             if (isLocked = tryLock()) {
+                log.debug("超时获取锁成功，共尝试：[{}] 次", count);
                 return true;
             }
             TimeUnit.MILLISECONDS.sleep(internal);
         } while (System.currentTimeMillis() < outTime);
+        log.warn("超时获取锁失败，耗时：[{}] 毫秒，共尝试：[{}] 次", millionSecond, count);
         return false;
+    }
+
+    /**
+     * 优化一下，添加休眠和超时失败
+     */
+    @Override
+    public void release() {
+        int count = 0;
+        while (isLocked() && count++ < DEFAULT_RELEASE_COUNT) {
+            if (tryRelease()) {
+                return;
+            }
+            try {
+                TimeUnit.MILLISECONDS.sleep(DEFAULT_RELEASE_INTERNAL);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
     }
 
 }

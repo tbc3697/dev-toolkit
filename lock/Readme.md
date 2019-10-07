@@ -25,9 +25,9 @@ String lockKey = "lock:key";
 DistributeLock lock = new JedisLock(lockKey, pool);
 LockSupport lockSupport = LockSupport.ofLock(lock)
     .ok(()->System.out.println("OK"))
-    .fail(()->System.out.println("FAIL");
+    .fail(()->System.out.println("FAIL");// 可以不指定，默认获取锁失败后将打印失败日志，不执行其它动作
 
-// 只会获取一次锁
+// 具体执行：只尝试获取一次锁，不成功就执行失败任务
 lockSupport.exec();
 // 带超时时间，获取锁失败时，会在超时时间内多次重试
 loclSupport.exec(5_000);

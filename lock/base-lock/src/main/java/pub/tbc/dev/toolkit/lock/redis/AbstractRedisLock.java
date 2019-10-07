@@ -21,7 +21,7 @@ public abstract class AbstractRedisLock<T extends AbstractRedisLock> extends Abs
     /**
      * 延长过期时间使用的 LUA 脚本
      */
-    // 文案2：先获取剩余过期时间，加上要续的时间，做为新的过期时间
+    // 方案2：先获取剩余过期时间，加上要续的时间，做为新的过期时间
     protected final String EXTEND_EXPIRE_SCRIPT = "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('expire', KEYS[1], ARGV[2]) else return 0 end";
 
     /**

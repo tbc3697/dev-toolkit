@@ -7,18 +7,15 @@ import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.params.SetParams;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
 /**
  * 基于 Redis 的分布式锁实现，使用 Jedis 做为 Redis 客户端;
  * 不支持重入
  */
 @Slf4j
-public class JedisLock extends AbstractRedisLock<JedisLock> {
+public class JedisReetrantLock extends AbstractRedisLock<JedisReetrantLock> {
 
     private JedisPool jedisPool;
 
@@ -59,7 +56,7 @@ public class JedisLock extends AbstractRedisLock<JedisLock> {
         }
     };
 
-    public JedisLock(String lockKey, JedisPool jedisPool) {
+    public JedisReetrantLock(String lockKey, JedisPool jedisPool) {
         super(lockKey);
         this.jedisPool = jedisPool;
     }

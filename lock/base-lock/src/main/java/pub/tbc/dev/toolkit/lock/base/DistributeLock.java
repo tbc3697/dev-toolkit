@@ -113,7 +113,6 @@ public interface DistributeLock<T extends DistributeLock> {
     default void release() {
         while (isLocked()) {
             tryRelease();
-
         }
     }
 
