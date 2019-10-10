@@ -174,12 +174,8 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
 
     @Override
     public boolean tryLock() {
-        // isLocked()方法若返回true，说明已经由当前进程内的某线程获取到了锁，反之则不一定确认锁空闲
         // 暂不支持重入
-        if (isLocked() ? false : (isLocked = lockFunc().get())) {
-            return afterLock();
-        }
-        return false;
+        return noLock() && (isLocked = lockFunc().get()) && afterLock();
     }
 
     @Override
@@ -238,7 +234,7 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     public boolean tryLock(long millionSecond, long internal) throws InterruptedException {
         // 计算超时时间点
         long outTime = millionSecond + System.currentTimeMillis();
-        // 尝试次数
+        // 尝试次数，目前仅用于日志输出
         int count = 0;
         // 用 do while 循环，先快速尝试一次
         do {
