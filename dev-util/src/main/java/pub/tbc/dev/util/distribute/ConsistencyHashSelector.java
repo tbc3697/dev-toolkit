@@ -2,45 +2,40 @@ package pub.tbc.dev.util.distribute;
 
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.TreeSet;
+import java.util.TreeMap;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * 基于一致性哈希的节点选择（不带虚拟节点）
  */
 @Slf4j
-public class ConsistencyHashSelector<T> implements NodeSelector<T> {
+public abstract class ConsistencyHashSelector implements NodeSelector {
 
-    private TreeSet<T> nodes = new TreeSet<>();
+    private int HASH_POINT = (1 << 32) - 1;
 
-    public ConsistencyHashSelector(Collection<T> nodes) {
-        this.nodes.addAll(nodes);
+    TreeMap<Integer, String> nodes = new TreeMap<>();
+
+    protected ConsistencyHashSelector(Collection<String> nodes) {
+        this.nodes.putAll(nodes.stream().collect(Collectors.toMap(String::hashCode, Function.identity())));
     }
 
-    @Override
-    public Collection<T> nodes() {
-        return nodes;
+    /**
+     * 简单扰动一下
+     */
+    protected int hash(String key) {
+        int h;
+        return (h = key.hashCode()) ^ (h >>> 24) ^ (h >>> 16) ^ (h >>> 8);
     }
 
-    @Override
-    public NodeSelector<T> add(T t) {
-        nodes.add(t);
-        return this;
+    /**
+     * 计算下标
+     */
+    protected int indexOf(String key) {
+        int hash = hash(key);
+        return hash & HASH_POINT;
     }
 
-    @Override
-    public NodeSelector<T> remove(T t) {
-        nodes.remove(t);
-        return this;
-    }
-
-    @Override
-    public T select(Object key) {
-        int hash = key.hashCode();
-
-
-
-
-        return null;
-    }
 }

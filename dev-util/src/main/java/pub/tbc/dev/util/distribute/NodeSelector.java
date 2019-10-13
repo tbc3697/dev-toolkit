@@ -5,16 +5,15 @@ import java.util.Collection;
 /**
  * 分布式系统节点选择接口
  *
- * @param <T>
  */
-public interface NodeSelector<T> {
+public interface NodeSelector {
 
-    Collection<T> nodes();
+    Collection nodes();
 
-    NodeSelector<T> add(T t);
+    NodeSelector add(String t);
 
-    NodeSelector<T> remove(T t);
+    NodeSelector remove(String t);
 
-    T select(Object key);
+    String select(Object key);
 
 }
