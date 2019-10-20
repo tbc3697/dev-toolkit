@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
 import org.springframework.data.redis.core.script.RedisScript;
-import pub.tbc.dev.toolkit.lock.redis.AbstractRedisLock;
+import pub.tbc.dev.toolkit.lock.base.AbstractDistributeLock;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.function.Supplier;
+
+import static pub.tbc.dev.toolkit.lock.redis.RedisLockConstant.*;
 
 /**
  * 以 RedisTemplate 做为 redis 客户端的分布式锁实现
@@ -16,7 +18,7 @@ import java.util.function.Supplier;
  * @Author tbc on 2019年06月06日
  */
 @Slf4j
-public class RedisTemplateLock extends AbstractRedisLock<RedisTemplateLock> {
+public class RedisTemplateLock extends AbstractDistributeLock<RedisTemplateLock> {
 
     private RedisTemplate<String, String> redisTemplate;
 

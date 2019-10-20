@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
  * 支持重入的分布式锁抽象实现
  */
 @Slf4j
+@Deprecated
 public abstract class AbstractReentrantDistributeLock<T extends AbstractReentrantDistributeLock> extends AbstractDistributeLock<T> {
 
     protected AbstractReentrantDistributeLock(String lockKey) {

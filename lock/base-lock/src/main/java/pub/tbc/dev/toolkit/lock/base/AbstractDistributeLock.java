@@ -113,7 +113,7 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     }
 
     /**
-     * 获得锁后执行的一些状态维护工作
+     * 释放锁后执行的一些状态维护工作
      */
     protected boolean afterRelease() {
         isLocked = false;

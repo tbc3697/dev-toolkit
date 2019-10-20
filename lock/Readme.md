@@ -7,7 +7,7 @@
 示例：
 
 直接使用锁：
-```java
+```
 JedisPool pool = new JedisPool(p, h);
 JedisLock lock = new JedisLock("lockKey", pool);
 if (lock.tryLock()) {

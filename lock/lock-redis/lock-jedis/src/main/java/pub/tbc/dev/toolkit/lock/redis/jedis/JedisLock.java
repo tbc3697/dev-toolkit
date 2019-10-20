@@ -2,27 +2,26 @@ package pub.tbc.dev.toolkit.lock.redis.jedis;
 
 
 import lombok.extern.slf4j.Slf4j;
-import pub.tbc.dev.toolkit.lock.redis.AbstractRedisLock;
+import pub.tbc.dev.toolkit.lock.base.AbstractDistributeLock;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.params.SetParams;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
+
+import static pub.tbc.dev.toolkit.lock.redis.RedisLockConstant.*;
 
 /**
  * 基于 Redis 的分布式锁实现，使用 Jedis 做为 Redis 客户端;
  * 不支持重入
  */
 @Slf4j
-public class JedisLock extends AbstractRedisLock<JedisLock> {
+public class JedisLock extends AbstractDistributeLock<JedisLock> {
 
     private JedisPool jedisPool;
 
-    private final Supplier<Boolean> lockFunc = () -> {
+    protected final Supplier<Boolean> lockFunc = () -> {
         try (Jedis jedis = jedisPool.getResource()) {
             String value = lockValue == null ? lockValue = createLockValue() : lockValue;
             String result = jedis.set(lockKey, value, SetParams.setParams().px((int) expire).nx());
@@ -35,7 +34,7 @@ public class JedisLock extends AbstractRedisLock<JedisLock> {
         }
     };
 
-    private final Supplier<Boolean> releaseFunc = () -> {
+    protected final Supplier<Boolean> releaseFunc = () -> {
         try (Jedis jedis = jedisPool.getResource()) {
             Object result = jedis.eval(RELEASE_SCRIPT, toList(lockKey), toList(lockValue));
             if (REDIS_RELEASE_OK.equals(result)) {
@@ -47,7 +46,7 @@ public class JedisLock extends AbstractRedisLock<JedisLock> {
         }
     };
 
-    private final Function<Long, Boolean> extendExpireFunc = expire -> {
+    protected final Function<Long, Boolean> extendExpireFunc = expire -> {
         try (Jedis jedis = jedisPool.getResource()) {
             Object result = jedis.eval(EXTEND_EXPIRE_SCRIPT, toList(lockKey), toList(lockValue, String.valueOf(expire)));
             if (REDIS_RELEASE_OK.equals(result)) {
