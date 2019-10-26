@@ -4,8 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * 组合优于继承，基于代理的分布式锁可重入实现
@@ -20,7 +18,7 @@ public class ReentrantDistributeLock implements DistributeLock<ReentrantDistribu
     /**
      * 锁获取次数，支持重入的关键，不用考虑线程，必须获取锁成功才能修改此变量
      */
-    private int acquireCount;
+    private volatile int acquireCount;
 
     public ReentrantDistributeLock(AbstractDistributeLock lock) {
         this.lock = lock;
@@ -118,15 +116,8 @@ public class ReentrantDistributeLock implements DistributeLock<ReentrantDistribu
 
     @Override
     public boolean tryLock() {
-        boolean result = false;
-        if (noLock() && lock.tryLock()) {
-            result = true;
-        } else if (isOwner()) {
-            if ((boolean) lock.lockFunc().get()) {
-                result = true;
-            }
-        }
-        if (result) {
+        boolean result;
+        if (result = noLock() && lock.tryLock() || (boolean) lock.lockFunc().get()) {
             acquireCount++;
         }
         return result;

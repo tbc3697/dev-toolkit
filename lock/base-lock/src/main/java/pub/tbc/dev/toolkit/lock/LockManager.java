@@ -1,12 +1,13 @@
 package pub.tbc.dev.toolkit.lock;
 
-import pub.tbc.dev.toolkit.lock.base.DistributeLock;
+import pub.tbc.dev.toolkit.lock.base.AbstractDistributeLock;
+import pub.tbc.dev.toolkit.lock.base.ReentrantDistributeLock;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
 /**
- * 锁工具管理器接口，可在应用中实现，比如spring应用可注入Jedis等仓库操作工具，以及应用名等锁key拼接工具
+ * 工厂, 锁工具管理器接口
  */
 public interface LockManager {
 
@@ -14,20 +15,18 @@ public interface LockManager {
         return Arrays.stream(ss).collect(Collectors.joining(":"));
     }
 
-    DistributeLock lock(String key);
+    default ReentrantDistributeLock reentrantLock(String key) {
+        return ReentrantDistributeLock.of(lock(key));
+    }
 
-//    DistributeLock pub.tbc.dev.toolkit.lock(String appName, String bizType, String bizId);
+    default LockSupport lockSupport(String key) {
+        return LockSupport.ofLock(lock(key));
+    }
 
-//    DistributeLock pub.tbc.dev.toolkit.lock(String sysName, String appName, String bizType, String bizId);
+    default LockSupport reentrantLockSupport(String key) {
+        return LockSupport.ofLock(reentrantLock(key));
+    }
 
-    /**
-     * 获取锁操作工具实例
-     */
-    LockSupport lockSupport(String key);
-
-//    LockSupport lockSupport(String appName, String bizType, String bizId);
-
-//    LockSupport lockSupport(String sysName, String appName, String bizType, String bizId);
-
+    AbstractDistributeLock lock(String key);
 
 }

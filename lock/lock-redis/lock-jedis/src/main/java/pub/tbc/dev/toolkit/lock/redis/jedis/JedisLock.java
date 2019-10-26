@@ -63,6 +63,18 @@ public class JedisLock extends AbstractDistributeLock<JedisLock> {
         this.jedisPool = jedisPool;
     }
 
+    public JedisLock(JedisPool jedisPool, String lockKey) {
+        super(lockKey);
+        this.jedisPool = jedisPool;
+    }
+
+    public static JedisLock of(String lockKey, JedisPool jedisPool){
+        return new JedisLock(lockKey, jedisPool);
+    }
+
+    public static JedisLock of(JedisPool jedisPool, String lockKey){
+        return new JedisLock(lockKey, jedisPool);
+    }
 
     @Override
     public Supplier<Boolean> lockFunc() {
