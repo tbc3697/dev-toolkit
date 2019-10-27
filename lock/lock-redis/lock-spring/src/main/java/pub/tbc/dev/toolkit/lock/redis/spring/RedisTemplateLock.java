@@ -27,42 +27,44 @@ public class RedisTemplateLock extends AbstractDistributeLock<RedisTemplateLock>
         this.redisTemplate = redisTemplate;
     }
 
-    private Supplier<Boolean> lockFunc = () -> redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, expire, TimeUnit.MILLISECONDS);
+    public static RedisTemplateLock of(String lockKey, RedisTemplate redisTemplate) {
+        return new RedisTemplateLock(lockKey, redisTemplate);
+    }
 
-    private Supplier<Boolean> releaseFunc = () -> {
-        RedisScript<Long> redisScript = new DefaultRedisScript<>(RELEASE_SCRIPT);
-        Long result = redisTemplate.execute(redisScript, toList(lockKey), lockValue);
-        if (REDIS_RELEASE_OK.equals(result)) {
-            return super.afterRelease();
-        } else {
-            log.error("解锁失败: {}", result);
-            return false;
-        }
-    };
-
-    private final Function<Long, Boolean> extendExpireFunc = expire -> {
-        RedisScript<Long> redisScript = new DefaultRedisScript<>(EXTEND_EXPIRE_SCRIPT);
-        Long result = redisTemplate.execute(redisScript, toList(lockKey), lockValue, expire);
-        if (REDIS_RELEASE_OK.equals(result)) {
-            return super.afterRelease();
-        } else {
-            log.error("解锁失败: {}", result);
-            return false;
-        }
-    };
+    public static RedisTemplateLock of(RedisTemplate redisTemplate, String lockKey) {
+        return new RedisTemplateLock(lockKey, redisTemplate);
+    }
 
     @Override
     public Supplier<Boolean> lockFunc() {
-        return lockFunc;
+        return () -> redisTemplate.opsForValue().setIfAbsent(lockKey, lockValue, expire, TimeUnit.MILLISECONDS);
     }
 
     @Override
     public Supplier<Boolean> releaseFunc() {
-        return releaseFunc;
+        return () -> {
+            RedisScript<Long> redisScript = new DefaultRedisScript<>(RELEASE_SCRIPT);
+            Long result = redisTemplate.execute(redisScript, toList(lockKey), lockValue);
+            if (REDIS_RELEASE_OK.equals(result)) {
+                return super.afterRelease();
+            } else {
+                log.error("解锁失败: {}", result);
+                return false;
+            }
+        };
     }
 
     @Override
     public Function<Long, Boolean> extendExpireFunc() {
-        return extendExpireFunc;
+        return expire -> {
+            RedisScript<Long> redisScript = new DefaultRedisScript<>(EXTEND_EXPIRE_SCRIPT);
+            Long result = redisTemplate.execute(redisScript, toList(lockKey), lockValue, expire);
+            if (REDIS_RELEASE_OK.equals(result)) {
+                return super.afterRelease();
+            } else {
+                log.error("解锁失败: {}", result);
+                return false;
+            }
+        };
     }
 }

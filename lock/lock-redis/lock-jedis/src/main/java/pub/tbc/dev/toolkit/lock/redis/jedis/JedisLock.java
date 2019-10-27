@@ -21,43 +21,6 @@ public class JedisLock extends AbstractDistributeLock<JedisLock> {
 
     private JedisPool jedisPool;
 
-    protected final Supplier<Boolean> lockFunc = () -> {
-        try (Jedis jedis = jedisPool.getResource()) {
-            String value = lockValue == null ? lockValue = createLockValue() : lockValue;
-            String result = jedis.set(lockKey, value, SetParams.setParams().px((int) expire).nx());
-            if (REDIS_LOCK_OK.equals(result)) {
-                return true;
-            } else {
-                log.error("加锁失败: {}", result);
-                return false;
-            }
-        }
-    };
-
-    protected final Supplier<Boolean> releaseFunc = () -> {
-        try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.eval(RELEASE_SCRIPT, toList(lockKey), toList(lockValue));
-            if (REDIS_RELEASE_OK.equals(result)) {
-                return true;
-            } else {
-                log.error("解锁失败: {}", result);
-                return false;
-            }
-        }
-    };
-
-    protected final Function<Long, Boolean> extendExpireFunc = expire -> {
-        try (Jedis jedis = jedisPool.getResource()) {
-            Object result = jedis.eval(EXTEND_EXPIRE_SCRIPT, toList(lockKey), toList(lockValue, String.valueOf(expire)));
-            if (REDIS_RELEASE_OK.equals(result)) {
-                return super.afterRelease();
-            } else {
-                log.error("延长过期时间失败: {}", result);
-                return false;
-            }
-        }
-    };
-
     public JedisLock(String lockKey, JedisPool jedisPool) {
         super(lockKey);
         this.jedisPool = jedisPool;
@@ -78,16 +41,47 @@ public class JedisLock extends AbstractDistributeLock<JedisLock> {
 
     @Override
     public Supplier<Boolean> lockFunc() {
-        return lockFunc;
+        return () -> {
+            try (Jedis jedis = jedisPool.getResource()) {
+                String value = lockValue == null ? lockValue = createLockValue() : lockValue;
+                String result = jedis.set(lockKey, value, SetParams.setParams().px((int) expire).nx());
+                if (REDIS_LOCK_OK.equals(result)) {
+                    return true;
+                } else {
+                    log.error("加锁失败: {}", result);
+                    return false;
+                }
+            }
+        };
     }
 
     @Override
     public Supplier<Boolean> releaseFunc() {
-        return releaseFunc;
+        return () -> {
+            try (Jedis jedis = jedisPool.getResource()) {
+                Object result = jedis.eval(RELEASE_SCRIPT, toList(lockKey), toList(lockValue));
+                if (REDIS_RELEASE_OK.equals(result)) {
+                    return true;
+                } else {
+                    log.error("解锁失败: {}", result);
+                    return false;
+                }
+            }
+        };
     }
 
     @Override
     public Function<Long, Boolean> extendExpireFunc() {
-        return extendExpireFunc;
+        return expire -> {
+            try (Jedis jedis = jedisPool.getResource()) {
+                Object result = jedis.eval(EXTEND_EXPIRE_SCRIPT, toList(lockKey), toList(lockValue, String.valueOf(expire)));
+                if (REDIS_RELEASE_OK.equals(result)) {
+                    return super.afterRelease();
+                } else {
+                    log.error("延长过期时间失败: {}", result);
+                    return false;
+                }
+            }
+        };
     }
 }
