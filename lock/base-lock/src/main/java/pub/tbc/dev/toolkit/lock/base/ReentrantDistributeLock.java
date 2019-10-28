@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * 组合优于继承，基于代理的分布式锁可重入实现
+ * 组合优于继承，基于装饰模式的分布式锁可重入实现
  *
  * @author tbc  by 2019/10/20
  */
