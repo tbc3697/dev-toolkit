@@ -1,7 +1,7 @@
 package pub.tbc.dev.toolkit.lock.redis;
 
 /**
- * 定义一些基于 redis 的分布式锁的共通属性，基于不同 redis 客户端的锁实现可继承此类
+ * 一些基于 redis 的分布式锁的常量
  *
  * @Author tbc by
  */

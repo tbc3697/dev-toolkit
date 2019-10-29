@@ -81,6 +81,10 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     // @formatter:on
 
     /**
+     * 抽象方法
+     * *************************************************************/
+
+    /**
      * 执行加锁动作的函数: 执行加锁动作，返回加锁结果；由子类提供，因子类可获得父类的 lockKey 等信息，因此不必带参数，Supplier就好
      */
     public abstract Supplier<Boolean> lockFunc();
@@ -94,6 +98,10 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
      * 执行延长锁过期时间动作的函数
      */
     public abstract Function<Long, Boolean> extendExpireFunc();
+
+    /**
+     * protected 方法
+     * *************************************************************/
 
     /**
      * 生成锁识别标识

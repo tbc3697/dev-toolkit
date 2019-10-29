@@ -3,7 +3,9 @@ package pub.tbc.dev.toolkit.lock.base;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * 支持重入的分布式锁抽象实现
+ * 支持重入的分布式锁抽象实现<br>
+ * 组合优于继承，使用装饰模式重新实现可重入分布式锁，此类作废
+ *
  */
 @Slf4j
 @Deprecated
