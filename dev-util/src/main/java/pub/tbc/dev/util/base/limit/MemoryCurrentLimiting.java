@@ -49,11 +49,8 @@ public class MemoryCurrentLimiting extends AbstractCurrentLimiting<MemoryCurrent
     }
 
     private LimitQueue get(String identity) {
-        LimitQueue list = container.get(identity);
-        if (list == null) {
-            return initListAndReturn(identity);
-        }
-        return list;
+        LimitQueue list;
+        return (list = container.get(identity)) == null ? initListAndReturn(identity) : list;
     }
 
     @Override
