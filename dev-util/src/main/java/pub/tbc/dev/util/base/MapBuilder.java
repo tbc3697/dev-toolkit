@@ -43,7 +43,7 @@ public final class MapBuilder<K, V> {
         return treeMap;
     }
 
-    public ConcurrentHashMap<K, V> toConrrentMap() {
+    public ConcurrentHashMap<K, V> toConcurrentMap() {
         ConcurrentHashMap<K, V> concurrentHashMap = new ConcurrentHashMap<>();
         concurrentHashMap.putAll(toHashMap());
         return concurrentHashMap;
