@@ -9,7 +9,4 @@ public abstract class AfterProxyOperation extends SurroundProxyOperation{
     public void before() {
 
     }
-
-    @Override
-    abstract public void after();
 }

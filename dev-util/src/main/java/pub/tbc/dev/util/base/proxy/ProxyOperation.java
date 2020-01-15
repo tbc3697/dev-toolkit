@@ -8,5 +8,14 @@ import java.lang.reflect.Method;
  */
 @FunctionalInterface
 public interface ProxyOperation {
+    /**
+     *
+     * @param target    被代理对象
+     * @param method    被调用的方法
+     * @param args      参数
+     * @return
+     * @throws InvocationTargetException
+     * @throws IllegalAccessException
+     */
     Object operation(Object target, Method method, Object[] args) throws InvocationTargetException, IllegalAccessException;
 }

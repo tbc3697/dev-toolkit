@@ -11,6 +11,8 @@
     <modules>
         <module>dev-util</module>
         <module>lock</module>
+        <module>fs-service</module>
+        <module>cache</module>
     </modules>
 
     <properties>

@@ -1,17 +1,17 @@
 package pub.tbc.dev.util.base.proxy;
 
-
-import pub.tbc.dev.util.base.EmptyUtil;
+import lombok.extern.slf4j.Slf4j;
 import pub.tbc.dev.util.base.Sleeps;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.util.Objects;
+
+import static pub.tbc.dev.util.base.EmptyUtil.nonNull;
 
 /**
  * @author tbc on 2016/11/20 20:28.
  */
+@Slf4j
 @SuppressWarnings("unchecked")
 public class ProxyFactory {
     /**
@@ -28,19 +28,8 @@ public class ProxyFactory {
         return (T) Proxy.newProxyInstance(
                 target.getClass().getClassLoader(),
                 target.getClass().getInterfaces(),
-                new InvocationHandler() {
-                    @Override
-                    public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                        // proxy no use?
-                        if (EmptyUtil.nonNull(operation))
-                            return operation(operation, method, args);
-                        return method.invoke(target, args);
-                    }
-
-                    private Object operation(ProxyOperation operation, Method method, Object[] args) throws Throwable {
-                        return operation.operation(target, method, args);
-                    }
-                });
+                (proxy, method, args) -> nonNull(operation) ? operation.operation(target, method, args) : method.invoke(target, args)
+        );
     }
 
     /**
@@ -64,7 +53,6 @@ public class ProxyFactory {
 
     public static void main(String[] args) {
         TestInterface target = new TestInterface() {
-
             @Override
             public void doSomething() {
                 System.out.println("target do something");
@@ -77,20 +65,7 @@ public class ProxyFactory {
             }
         };
 
-        TestInterface test = newJdkDynamicProxy(target, new SurroundProxyOperation() {
-            long startTime;
-
-            @Override
-            void before() {
-                System.out.println("startup...");
-                startTime = System.currentTimeMillis();
-            }
-
-            @Override
-            void after() {
-                System.out.println("耗时： " + (System.currentTimeMillis() - startTime) + " 毫秒");
-            }
-        });
+        TestInterface test = newJdkDynamicProxy(target, new InvokerTimeProxy());
         test.doSomething();
         test.doSomething("hello world");
 
