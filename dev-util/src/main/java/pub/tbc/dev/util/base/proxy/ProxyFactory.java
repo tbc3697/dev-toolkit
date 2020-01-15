@@ -24,7 +24,6 @@ public class ProxyFactory {
      */
     public static <T> T newJdkDynamicProxy(final Object target, final ProxyOperation operation) {
         Objects.requireNonNull(target);
-
         return (T) Proxy.newProxyInstance(
                 target.getClass().getClassLoader(),
                 target.getClass().getInterfaces(),

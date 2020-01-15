@@ -17,7 +17,7 @@ public abstract class SurroundProxyOperation implements ProxyOperation {
         return result;
     }
 
-    abstract void before();
+    public abstract void before();
 
-    abstract void after();
+    public abstract void after();
 }

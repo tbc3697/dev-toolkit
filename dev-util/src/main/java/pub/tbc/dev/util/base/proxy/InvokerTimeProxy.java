@@ -20,14 +20,14 @@ public class InvokerTimeProxy extends SurroundProxyOperation {
     }
 
     @Override
-    void before() {
+    public void before() {
         if (log != null) {
             startTime = System.currentTimeMillis();
         }
     }
 
     @Override
-    void after() {
+    public void after() {
         String msgTemplate = "方法调用耗时：[{}] 毫秒";
         long time = System.currentTimeMillis() - startTime;
         if (log == null) {
