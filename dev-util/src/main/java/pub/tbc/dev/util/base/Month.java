@@ -7,7 +7,7 @@ import java.util.Arrays;
 /**
  * @author tbc on 2016/11/9 22:44.
  */
-public enum Month implements Enums.GenericEnum {
+public enum Month {
     ONE(1, "一月", "January", "Jan."),
     TWO(2, "二月", "February", "Feb."),
     THREE(3, "三月", "March", "Mar."),
