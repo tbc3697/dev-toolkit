@@ -1,4 +1,4 @@
-package pub.tbc.dev.util.base;
+package pub.tbc.dev.util.base.enums;
 
 import lombok.Getter;
 
@@ -55,5 +55,4 @@ public enum Month {
     public static String getAbbr(int code) {
         return of(code).getAbbr();
     }
-
 }
