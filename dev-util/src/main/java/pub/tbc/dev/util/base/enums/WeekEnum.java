@@ -5,7 +5,7 @@ import lombok.Getter;
 /**
  * @author tbc on 2016/11/9 23:01.
  */
-public enum Week {
+public enum WeekEnum {
     ONE(1, "星期一", "Monday", "Mon."),
     TWO(2, "星期二", "Tuesday", "Tue."),
     THREE(3, "星期三", "Wednesday", "Wed."),
@@ -23,14 +23,14 @@ public enum Week {
     @Getter
     private String enSimple;
 
-    Week(int code, String cn, String en, String enSimple) {
+    WeekEnum(int code, String cn, String en, String enSimple) {
         this.code = code;
         this.cn = cn;
         this.en = en;
         this.enSimple = enSimple;
     }
 
-    public static Week of(int code) {
+    public static WeekEnum of(int code) {
         switch (code) {
             case 1:
                 return ONE;
