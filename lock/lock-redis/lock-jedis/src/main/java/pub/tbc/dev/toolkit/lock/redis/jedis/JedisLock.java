@@ -76,7 +76,7 @@ public class JedisLock extends AbstractDistributeLock<JedisLock> {
             try (Jedis jedis = jedisPool.getResource()) {
                 Object result = jedis.eval(EXTEND_EXPIRE_SCRIPT, toList(lockKey), toList(lockValue, String.valueOf(expire)));
                 if (REDIS_RELEASE_OK.equals(result)) {
-                    return super.afterRelease();
+                    return true;
                 } else {
                     log.error("延长过期时间失败: {}", result);
                     return false;

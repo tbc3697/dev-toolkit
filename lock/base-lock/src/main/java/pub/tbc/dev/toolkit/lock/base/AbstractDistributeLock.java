@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -22,6 +23,8 @@ import static java.time.LocalDateTime.ofInstant;
  */
 @Slf4j
 public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> implements DistributeLock<T> {
+
+    private AtomicBoolean memoryLock = new AtomicBoolean(false);
 
     protected AbstractDistributeLock(String lockKey) {
         this.lockKey = lockKey;
@@ -86,6 +89,7 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
 
     /**
      * 执行加锁动作的函数: 执行加锁动作，返回加锁结果；由子类提供，因子类可获得父类的 lockKey 等信息，因此不必带参数，Supplier就好
+     * 但是，这就使子类跟父类强耦合，要扩展新的实现，必须了解父类
      */
     public abstract Supplier<Boolean> lockFunc();
 
@@ -114,21 +118,38 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
      * 获得锁后执行的一些状态维护工作
      */
     protected boolean afterLock() {
-        isLocked = true;
-        owner = Thread.currentThread();
-        expireTime = expire + System.currentTimeMillis();
+        // 只有获取锁成功才能调用此方法，只此只要简单的判断下状态即可，不需要CAS保证
+        if (isLocked) {
+            try {
+                owner = Thread.currentThread();
+                expireTime = expire + System.currentTimeMillis();
+            } finally {
+                memoryLock.set(false);
+            }
+        }
         return true;
     }
 
     /**
-     * 释放锁后执行的一些状态维护工作
+     * 释放锁后执行的一些本地状态维护工作
      */
     protected boolean afterRelease() {
-        isLocked = false;
-        lockValue = null;
-        owner = null;
-        expireTime = -1;
+        // 使用CAS保证本地状态维护过程的原子性，否则可能导致一些基于本地状态的判断出现失误
+        if (memoryLock.compareAndSet(false, true)) {
+            try {
+                isLocked = false;
+                lockValue = null;
+                owner = null;
+                expireTime = -1;
+            } finally {
+                memoryLock.set(false);
+            }
+        }
         return true;
+    }
+
+    protected boolean afterExtend() {
+        return (expireTime += System.currentTimeMillis()) == expireTime;
     }
 
     protected List<String> toList(String... ss) {
@@ -182,7 +203,6 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
 
     @Override
     public boolean tryLock() {
-        // 暂不支持重入
         return noLock() && (isLocked = lockFunc().get()) && afterLock();
     }
 
@@ -219,7 +239,7 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
     @Override
     public boolean extendExpire(long expire) {
         // 注：不要验证锁持有者，因为通常是某线程得到锁执行任务时，启动一个新线程监视执行状态，若接近过期时任务未完成为其延期
-        return extendExpireFunc().apply(expire);
+        return extendExpireFunc().apply(expire) ? afterExtend() : false;
     }
 
     @Override
@@ -249,7 +269,7 @@ public abstract class AbstractDistributeLock<T extends AbstractDistributeLock> i
             count++;
             if (isLocked = tryLock()) {
                 log.debug("超时获取锁成功，共尝试：[{}] 次", count);
-                return true;
+                return afterLock();
             }
             TimeUnit.MILLISECONDS.sleep(internal);
         } while (System.currentTimeMillis() < outTime);

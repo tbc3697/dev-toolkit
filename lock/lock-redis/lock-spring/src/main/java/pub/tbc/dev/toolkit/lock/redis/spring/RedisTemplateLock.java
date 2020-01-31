@@ -20,6 +20,8 @@ import static pub.tbc.dev.toolkit.lock.redis.RedisLockConstant.*;
 @Slf4j
 public class RedisTemplateLock extends AbstractDistributeLock<RedisTemplateLock> {
 
+    private RedisScript<Long> RELEASE_SCRIPT_OBJ  = new DefaultRedisScript<>(RELEASE_SCRIPT);
+
     private RedisTemplate<String, String> redisTemplate;
 
     protected RedisTemplateLock(String lockKey, RedisTemplate redisTemplate) {
@@ -43,10 +45,9 @@ public class RedisTemplateLock extends AbstractDistributeLock<RedisTemplateLock>
     @Override
     public Supplier<Boolean> releaseFunc() {
         return () -> {
-            RedisScript<Long> redisScript = new DefaultRedisScript<>(RELEASE_SCRIPT);
-            Long result = redisTemplate.execute(redisScript, toList(lockKey), lockValue);
+            Long result = redisTemplate.execute(RELEASE_SCRIPT_OBJ, toList(lockKey), lockValue);
             if (REDIS_RELEASE_OK.equals(result)) {
-                return super.afterRelease();
+                return true;
             } else {
                 log.error("解锁失败: {}", result);
                 return false;
@@ -60,7 +61,7 @@ public class RedisTemplateLock extends AbstractDistributeLock<RedisTemplateLock>
             RedisScript<Long> redisScript = new DefaultRedisScript<>(EXTEND_EXPIRE_SCRIPT);
             Long result = redisTemplate.execute(redisScript, toList(lockKey), lockValue, expire);
             if (REDIS_RELEASE_OK.equals(result)) {
-                return super.afterRelease();
+                return true;
             } else {
                 log.error("解锁失败: {}", result);
                 return false;
