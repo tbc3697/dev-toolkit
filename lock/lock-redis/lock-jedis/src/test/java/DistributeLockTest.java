@@ -1,4 +1,4 @@
-import pub.tbc.dev.toolkit.lock.LockSupport;
+import pub.tbc.dev.toolkit.lock.LockWrapper;
 import pub.tbc.dev.toolkit.lock.redis.jedis.JedisLock;
 import redis.clients.jedis.JedisPool;
 
@@ -25,7 +25,7 @@ public class DistributeLockTest {
     }
 
     public void lockSupportTest() {
-        LockSupport.ofLock(lock)
+        LockWrapper.ofLock(lock)
                 .ok(() -> System.out.println("OK"))
                 .fail(() -> System.out.println("OK"))
                 .exec();

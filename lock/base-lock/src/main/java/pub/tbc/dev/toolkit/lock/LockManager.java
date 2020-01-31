@@ -19,12 +19,12 @@ public interface LockManager {
         return ReentrantDistributeLock.of(lock(key));
     }
 
-    default LockSupport lockSupport(String key) {
-        return LockSupport.ofLock(lock(key));
+    default LockWrapper lockSupport(String key) {
+        return LockWrapper.ofLock(lock(key));
     }
 
-    default LockSupport reentrantLockSupport(String key) {
-        return LockSupport.ofLock(reentrantLock(key));
+    default LockWrapper reentrantLockSupport(String key) {
+        return LockWrapper.ofLock(reentrantLock(key));
     }
 
     AbstractDistributeLock lock(String key);

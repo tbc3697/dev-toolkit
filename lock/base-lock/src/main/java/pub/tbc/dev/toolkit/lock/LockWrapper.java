@@ -15,7 +15,7 @@ import java.util.function.Supplier;
  */
 @Slf4j
 @RequiredArgsConstructor(staticName = "ofLock")
-public class LockSupport<T> {
+public class LockWrapper<T> {
 
     private Supplier<T> DEFAULT_FAIL_SUPPLIER = toSupplier(() -> log.error("获取锁失败"));
 
@@ -87,7 +87,7 @@ public class LockSupport<T> {
      * @param runnable
      * @return
      */
-    public LockSupport ok(Runnable runnable) {
+    public LockWrapper ok(Runnable runnable) {
         return ok(toSupplier(runnable));
     }
 
@@ -97,7 +97,7 @@ public class LockSupport<T> {
      * @param supplier
      * @return
      */
-    public LockSupport ok(Supplier<T> supplier) {
+    public LockWrapper ok(Supplier<T> supplier) {
         this.okSupplier = supplier;
         return this;
     }
@@ -108,7 +108,7 @@ public class LockSupport<T> {
      * @param runnable
      * @return
      */
-    public LockSupport fail(Runnable runnable) {
+    public LockWrapper fail(Runnable runnable) {
         return fail(toSupplier(runnable));
     }
 
@@ -118,7 +118,7 @@ public class LockSupport<T> {
      * @param supplier
      * @return
      */
-    public LockSupport fail(Supplier<T> supplier) {
+    public LockWrapper fail(Supplier<T> supplier) {
         failSupplier = supplier;
         return this;
     }
