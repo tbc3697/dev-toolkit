@@ -28,6 +28,10 @@ public class ReentrantDistributeLock implements DistributeLock<ReentrantDistribu
         return new ReentrantDistributeLock(lock);
     }
 
+    private boolean acquireReduce() {
+        return --acquireCount == acquireCount;
+    }
+
     @Override
     public boolean isLocked() {
         return lock.isLocked();
@@ -117,7 +121,9 @@ public class ReentrantDistributeLock implements DistributeLock<ReentrantDistribu
     @Override
     public boolean tryLock() {
         boolean result;
-        if (result = noLock() && lock.tryLock() || (boolean) lock.lockFunc().get()) {
+        // 重入后是否要延期？暂不考虑
+        // 如果已持有锁，且重入次数大于0，直接认为获取锁成功，否则尝试获取锁
+        if (result = (isOwner() && acquireCount > 0) || lock.tryLock()) {
             acquireCount++;
         }
         return result;
@@ -126,14 +132,18 @@ public class ReentrantDistributeLock implements DistributeLock<ReentrantDistribu
     @Override
     public boolean tryRelease() {
         // 若不是当前线程持有锁，不支持释放锁
-        if (noLock() && isNotOwner()) {
+        if (noLock() || isNotOwner()) {
             log.error("仅支持持有锁的线程释放");
             return false;
         }
-        if (!(lock.isLocked = (!(boolean) lock.releaseFunc().get()))) {
-            return --acquireCount > 0 ? true : lock.afterRelease();
+        // if (acquireCount <= 0) {
+        //     throw new RuntimeException();
+        // }
+        if (acquireCount > 1) {
+            return acquireReduce();
         } else {
-            return false;
+            return lock.tryRelease() && acquireReduce();
         }
     }
+
 }

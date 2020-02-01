@@ -148,7 +148,7 @@ public class LockWrapper<T> {
      * @param waitingMilliseconds 获取锁的等待时间（毫秒）
      * @return
      */
-    // 文案2：可以用lock自带的支持超时获取锁的方法
+    // 方案2：可以用lock自带的支持超时获取锁的方法
     public T exec(long waitingMilliseconds) {
         long endTime = System.currentTimeMillis() + waitingMilliseconds;
         return exec(() -> System.currentTimeMillis() < endTime);
