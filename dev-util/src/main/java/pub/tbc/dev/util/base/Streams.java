@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  * @author tbc on 2016/9/23 1:09.
  */
 @Slf4j
+@Deprecated
 public class Streams {
 
     /**

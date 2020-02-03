@@ -40,11 +40,6 @@ public class Holder<T> {
         return value == null ? empty() : of(value);
     }
 
-    public Holder<T> set(T t) {
-        value = t;
-        return this;
-    }
-
     public T get() {
         if (value == null) {
             throw new NoSuchElementException("No value present");
@@ -147,6 +142,15 @@ public class Holder<T> {
         return value != null
                 ? String.format("ObjectHolder[%s]", value)
                 : "ObjectHolder.empty";
+    }
+
+    /**
+     * 非 Optional 方法
+     ******************************************************************/
+
+    public Holder<T> set(T t) {
+        value = t;
+        return this;
     }
 
 }

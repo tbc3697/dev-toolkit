@@ -14,8 +14,8 @@ public class LockerTest {
         Lock lock = new ReentrantLock();
         Locker.ofLock(lock)
                 .internal(500)
-                .run(()->System.out.println("aaa"))
-                .tryDo(50000);
+                .task(()->System.out.println("aaa"))
+                .tryExec(50000);
         Locker.ofLock(lock).exec(() -> System.out.println("aaa"));
     }
 }
