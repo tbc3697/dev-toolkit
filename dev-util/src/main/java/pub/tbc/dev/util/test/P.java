@@ -1,15 +1,21 @@
 package pub.tbc.dev.util.test;
 
+import pub.tbc.dev.util.base.Holder;
+
+import java.util.stream.Stream;
+
 /**
  * 控制台日志输出辅助类（测试调试用，禁止生产环境使用）
  *
  * @author tbc  by 2020/2/10
  */
 public final class P {
+    // @formatter:off
     /** 占位符 */
     public static final String PLACEHOLDER = "\\{}";
     /** 默认调用栈数组开始打印的下标 */
     public static final int DEFAULT_STACK_START_INDEX = 2;
+    // @formatter:on
 
     public static StackTraceElement[] stackTraceElements() {
         return Thread.currentThread().getStackTrace();
@@ -19,8 +25,10 @@ public final class P {
      * 格式化日志输出
      */
     public static void print(String msg, Object... params) {
-        for (Object param : params) {
-            msg = msg.replaceFirst(PLACEHOLDER, param.toString());
+        if (params != null) {
+            for (Object param : params) {
+                msg = msg.replaceFirst(PLACEHOLDER, param.toString());
+            }
         }
         System.out.println(msg);
     }
