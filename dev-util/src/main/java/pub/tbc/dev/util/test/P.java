@@ -21,7 +21,7 @@ public final class P {
      * 格式化日志输出
      */
     public static void print(String msg, Object... params) {
-        if (params != null) {
+        if (params != null && params.length > 0) {
             for (Object param : params) {
                 msg = msg.replaceFirst(PLACEHOLDER, param.toString());
             }
