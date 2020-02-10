@@ -1,7 +1,5 @@
 package pub.tbc.dev.util.test;
 
-import java.util.Arrays;
-
 /**
  * 控制台日志输出辅助类（测试调试用，禁止生产环境使用）
  *
@@ -25,10 +23,14 @@ public final class P {
     public static void print(String msg, Object... params) {
         if (params != null && params.length > 0) {
             for (Object param : params) {
-                msg = msg.replaceFirst(PLACEHOLDER, param == null ? "" : param.toString());
+                msg = msg.replaceFirst(PLACEHOLDER, param == null ? "null" : param.toString());
             }
         }
         System.out.println(msg);
+    }
+
+    public static void print(String msg) {
+        print(msg, null);
     }
 
     /**
@@ -55,6 +57,10 @@ public final class P {
     public static void printStack(String msg, Object... params) {
         print(msg, params);
         printStack(3);
+    }
+
+    public static void main(String[] args){
+        print("sss");
     }
 
 }
