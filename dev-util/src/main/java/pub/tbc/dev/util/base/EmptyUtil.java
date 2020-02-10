@@ -1,7 +1,9 @@
 package pub.tbc.dev.util.base;
 
+import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -78,6 +80,31 @@ public class EmptyUtil {
             return ((Collection) obj).isEmpty();
         }
         return obj instanceof String && ((String) obj).length() == 0;
+    }
+
+    @SuppressWarnings("rawtypes")
+    public static boolean isEmpty0(Object obj) {
+        if (obj == null) {
+            return true;
+        }
+
+        if (obj instanceof Optional) {
+            return !((Optional) obj).isPresent();
+        }
+        if (obj instanceof CharSequence) {
+            return ((CharSequence) obj).length() == 0;
+        }
+        if (obj.getClass().isArray()) {
+            return Array.getLength(obj) == 0;
+        }
+        if (obj instanceof Collection) {
+            return ((Collection) obj).isEmpty();
+        }
+        if (obj instanceof Map) {
+            return ((Map) obj).isEmpty();
+        }
+
+        return false;
     }
 
     public static boolean isEmpty(String str) {
