@@ -1,9 +1,5 @@
 package pub.tbc.dev.util.test;
 
-import pub.tbc.dev.util.base.Holder;
-
-import java.util.stream.Stream;
-
 /**
  * 控制台日志输出辅助类（测试调试用，禁止生产环境使用）
  *
