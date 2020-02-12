@@ -43,15 +43,19 @@ public final class P {
         print0(msg(msg, params), System.out::println);
     }
 
+    public static void println(String msg) {
+        print0(msg, System.out::println);
+    }
+
     /**
      * 格式化日志输出，不换行
      */
     public static void print(String msg, Object... params) {
-        print0(msg(msg,params), System.out::print);
+        print0(msg(msg, params), System.out::print);
     }
 
     public static void print(String msg) {
-        print(msg, null);
+        print0(msg, System.out::println);
     }
 
     /**
@@ -78,10 +82,6 @@ public final class P {
     public static void printStack(String msg, Object... params) {
         print(msg, params);
         printStack(3);
-    }
-
-    public static void main(String[] args){
-        print("sss");
     }
 
 }
