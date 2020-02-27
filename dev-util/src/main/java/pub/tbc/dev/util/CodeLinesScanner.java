@@ -1,11 +1,10 @@
 package pub.tbc.dev.util;
 
-import jdk.internal.util.xml.impl.ReaderUTF8;
 import pub.tbc.dev.util.test.P;
 
 import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.function.Predicate;
@@ -21,9 +20,10 @@ public class CodeLinesScanner {
 
     static {
         String scanPath = System.getProperty(SCAN_PATH);
-        System.setProperty(SCAN_PATH, scanPath == null
-                ? CodeLinesScanner.class.getResource("").getPath().replace("target/classes", "src/main/java")
-                : scanPath);
+        System.setProperty(SCAN_PATH,
+                scanPath == null
+                        ? CodeLinesScanner.class.getResource("").getPath().replace("target/classes", "src/main/java")
+                        : scanPath);
     }
 
     private static Optional<String> getScanPath(String[] args) {
@@ -58,7 +58,7 @@ public class CodeLinesScanner {
     }
 
     private static long computeCodeLineNum(File file, Predicate<String> filter) {
-        try (BufferedReader bufferedReader = new BufferedReader(new ReaderUTF8(new FileInputStream(file)))) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             return bufferedReader.lines().filter(filter).count();
         } catch (IOException e) {
             throw new RuntimeException(e);
