@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  pub.tbc.dev.toolkit.lock.redis.spring.boot.autoconfigure.LockSpringBootAutoConfiguration

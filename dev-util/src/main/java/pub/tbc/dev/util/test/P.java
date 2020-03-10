@@ -1,5 +1,6 @@
 package pub.tbc.dev.util.test;
 
+import java.util.Objects;
 import java.util.function.Consumer;
 
 /**
@@ -34,6 +35,11 @@ public final class P {
 
     public static void print0(String msg, Consumer<String> consumer) {
         consumer.accept(msg);
+    }
+
+    public static void println(Object obj) {
+        Objects.requireNonNull(obj, "输出内容不允许为空");
+        println(obj.toString());
     }
 
     /**
