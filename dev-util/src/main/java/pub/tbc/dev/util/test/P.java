@@ -10,16 +10,42 @@ import java.util.function.Consumer;
  */
 public final class P {
     // @formatter:off
+
+    /** $符号监听替换字符串 */
+    private static String REPLACE_$_TEMP = "!@##@!!@#%%";
     /** 占位符: {} */
     public static final String PLACEHOLDER = "\\{}";
     /** 默认调用栈数组开始打印的下标 */
     public static final int DEFAULT_STACK_START_INDEX = 2;
     // @formatter:on
 
+    /**
+     * @param s         要处理的字符串
+     * @param restore   规避还是还原
+     */
+    private static String process$(String s, boolean restore) {
+        return restore ? s.replace(REPLACE_$_TEMP, "$") : s.replace("$", REPLACE_$_TEMP);
+    }
+
+    /**
+     * Matcher做替换时replaceAll 或者 replaceFirst 时，会对字符串中的“$”符号敏感，得到不可预知结果
+     *
+     * @param msg
+     * @param params
+     */
     private static String msg(String msg, Object... params) {
         if (params != null && params.length > 0) {
+            boolean have$ = false;
             for (Object param : params) {
-                msg = msg.replaceFirst(PLACEHOLDER, param == null ? "null" : param.toString());
+                String p = param.toString();
+                if (p.contains("$")) {
+                    have$ = true;
+                    p = process$(p, false);
+                }
+                msg = msg.replaceFirst(PLACEHOLDER, p);
+            }
+            if (have$) {
+                msg = process$(msg, true);
             }
         }
         return msg;
