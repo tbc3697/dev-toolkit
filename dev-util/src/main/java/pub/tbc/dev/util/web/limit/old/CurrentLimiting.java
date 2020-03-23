@@ -1,4 +1,4 @@
-package pub.tbc.dev.util.base.limit;
+package pub.tbc.dev.util.web.limit.old;
 
 import java.util.concurrent.TimeUnit;
 
@@ -74,6 +74,7 @@ public interface CurrentLimiting<T extends CurrentLimiting> {
      */
     default boolean call(String identity) {
         if (isLimit(identity)) {
+            add(identity);
             return false;
         } else {
             add(identity);

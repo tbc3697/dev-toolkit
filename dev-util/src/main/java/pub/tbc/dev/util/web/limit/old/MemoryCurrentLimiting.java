@@ -1,4 +1,6 @@
-package pub.tbc.dev.util.base.limit;
+package pub.tbc.dev.util.web.limit.old;
+
+import pub.tbc.dev.util.web.limit.LimitStrategy;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -8,9 +10,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
  *
  * @Author tbc on 2019-07-29 13:34
  */
-public class MemoryCurrentLimiting extends AbstractCurrentLimiting<MemoryCurrentLimiting> {
+public class MemoryCurrentLimiting extends AbstractCurrentLimiting<MemoryCurrentLimiting> implements LimitStrategy {
 
     private HashMap<String, LimitQueue> container;
+
     private AtomicBoolean lock = new AtomicBoolean(false) {
         public void setFalse() {
             set(false);
@@ -27,8 +30,7 @@ public class MemoryCurrentLimiting extends AbstractCurrentLimiting<MemoryCurrent
 
     public MemoryCurrentLimiting(int initialCapacity, int count, long outTime) {
         container = new HashMap<>(initialCapacity);
-        setCount(count);
-        setPeriod(outTime);
+        setCount(count).setPeriod(outTime);
     }
 
     private LimitQueue initListAndReturn(String identity) {
@@ -66,4 +68,8 @@ public class MemoryCurrentLimiting extends AbstractCurrentLimiting<MemoryCurrent
     }
 
 
+    @Override
+    public boolean callOn(Object param, boolean containThis) {
+        return isLimit(param.toString());
+    }
 }

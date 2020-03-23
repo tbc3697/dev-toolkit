@@ -1,4 +1,4 @@
-package pub.tbc.dev.util.base.limit;
+package pub.tbc.dev.util.web.limit.old;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -7,7 +7,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  */
 public class LimitQueue {
 
-    private int capacity;
+    private final int capacity;
     private int size;
     private Node first;
     private Node last;

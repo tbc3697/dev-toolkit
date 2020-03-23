@@ -16,7 +16,7 @@ public abstract class ConsistencyHashSelector implements NodeSelector {
 
     private int HASH_POINT = (1 << 32) - 1;
 
-    TreeMap<Integer, String> nodes = new TreeMap<>();
+    protected TreeMap<Integer, String> nodes = new TreeMap<>();
 
     protected ConsistencyHashSelector(Collection<String> nodes) {
         this.nodes.putAll(nodes.stream().collect(Collectors.toMap(String::hashCode, Function.identity())));

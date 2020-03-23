@@ -1,4 +1,4 @@
-package pub.tbc.dev.util.base.limit;
+package pub.tbc.dev.util.web.limit.old;
 
 /**
  * 抽象限流容器

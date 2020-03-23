@@ -38,7 +38,7 @@ public enum WebStatusEnum {
         return Stream.of(values())
                 .filter(s -> s.getCode() == code)
                 .findAny()
-                .orElseThrow(() -> new RuntimeException());
+                .orElseThrow(() -> new RuntimeException("不被支持的状态码"));
     }
 
 

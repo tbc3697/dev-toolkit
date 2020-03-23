@@ -2,6 +2,9 @@ package pub.tbc.dev.util.distribute;
 
 import java.util.Collection;
 
+/**
+ * 不支持虚拟节点的实现
+ */
 public class NoVirtualConsistencyHashSelector extends ConsistencyHashSelector {
 
 
@@ -11,7 +14,7 @@ public class NoVirtualConsistencyHashSelector extends ConsistencyHashSelector {
 
     @Override
     public Collection nodes() {
-        return null;
+        return super.nodes.values();
     }
 
     @Override
