@@ -1,26 +1,26 @@
 package pub.tbc.dev.util.web.limit.queue;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.experimental.Accessors;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import pub.tbc.dev.util.test.P;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
+ * 基于单向链表的简单实现
+ *
  * @author tbc  by 2020/3/24
  */
 @Slf4j
-public class SimpleCyclicBoundedQueueImpl<E> implements CyclicBoundedQueue<E> {
+public class LinkedCyclicBoundedQueueImpl<E> implements CyclicBoundedQueue<E> {
     Node<E> h, t;
     // 队列容量
     final int capacity;
     // 元素数量
-    AtomicInteger count = new AtomicInteger(0);
+    final AtomicInteger count = new AtomicInteger(0);
 
-    public SimpleCyclicBoundedQueueImpl(int capacity) {
+    public LinkedCyclicBoundedQueueImpl(int capacity) {
         this.capacity = capacity;
     }
 
@@ -33,6 +33,10 @@ public class SimpleCyclicBoundedQueueImpl<E> implements CyclicBoundedQueue<E> {
         Node<E> oldH = h;
         h = h.next;
         return oldH;
+    }
+
+    private Optional<E> getValue(Node<E> e) {
+        return Optional.ofNullable(e).map(Node::getValue);
     }
 
     @Override
@@ -54,14 +58,7 @@ public class SimpleCyclicBoundedQueueImpl<E> implements CyclicBoundedQueue<E> {
             addTail(newNode);
             result = updateHead().value;
         }
-//        if (log.isDebugEnabled()) {
-//            P.println("[{}]入队列，[{}]出队列", e, result == null ? "XX" : result);
-//        }
         return Optional.ofNullable(result);
-    }
-
-    private Optional<E> getValue(Node<E> e) {
-        return Optional.ofNullable(e).map(Node::value);
     }
 
     @Override
@@ -89,11 +86,16 @@ public class SimpleCyclicBoundedQueueImpl<E> implements CyclicBoundedQueue<E> {
         return count.intValue() == capacity;
     }
 
-    @Data
-    @Accessors(fluent = true)
-    @AllArgsConstructor
+
     class Node<E> {
         Node<E> next;
+        @Getter
         E value;
+
+        Node(Node<E> next, E v) {
+            Objects.requireNonNull(v, "节点的值不能为空");
+            this.next = next;
+            this.value = v;
+        }
     }
 }

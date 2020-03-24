@@ -3,6 +3,8 @@ package pub.tbc.dev.util.web.limit.queue;
 import java.util.Optional;
 
 /**
+ * 有界队列：当队列满时添加新元素，移除 head 后将新元素加到队尾
+ *
  * @author tbc  by 2020/3/24
  */
 // @formatter:off
@@ -23,8 +25,10 @@ public interface CyclicBoundedQueue<E> {
     Optional<E> ifFullGetHead();
 
     /** 若条件成立，执行put操作 */
+    @Deprecated
     boolean ifMatchPut(Condition p, E e);
 
+    @Deprecated
     @FunctionalInterface
     interface Condition {
         boolean test();

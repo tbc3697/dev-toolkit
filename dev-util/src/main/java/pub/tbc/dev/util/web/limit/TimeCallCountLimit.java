@@ -1,8 +1,9 @@
 package pub.tbc.dev.util.web.limit;
 
 import lombok.extern.slf4j.Slf4j;
+import pub.tbc.dev.util.web.limit.queue.ArrayCyclicBoundedQueue;
 import pub.tbc.dev.util.web.limit.queue.CyclicBoundedQueue;
-import pub.tbc.dev.util.web.limit.queue.SimpleCyclicBoundedQueueImpl;
+import pub.tbc.dev.util.web.limit.queue.LinkedCyclicBoundedQueueImpl;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -32,7 +33,7 @@ public class TimeCallCountLimit implements LimitStrategy {
         if (queue == null) {
             synchronized (param.toString().intern()) {
                 if ((queue = store.get(param)) == null) {
-                    store.put(param, queue = new SimpleCyclicBoundedQueueImpl<>(count));
+                    store.put(param, queue = new LinkedCyclicBoundedQueueImpl<>(count));
                 }
             }
         }

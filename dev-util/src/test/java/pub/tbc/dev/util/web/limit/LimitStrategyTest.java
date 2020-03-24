@@ -24,7 +24,7 @@ public class LimitStrategyTest {
 
         CountDownLatch countDownLatch = new CountDownLatch(1000);
         AtomicInteger trigger = new AtomicInteger();
-        String msg = "【{}】【{}】收到用户【tbc】请求，流控计算结果：{}";
+//        String msg = "【{}】【{}】收到用户【tbc】请求，流控计算结果：{}";
         long startTime = System.currentTimeMillis();
         for (int i = 0; i < REQ_COUNT; i++) {
 //            executor.execute(() -> P.println(msg, Thread.currentThread().getName(), System.currentTimeMillis(), strategy.callOn(user)));
