@@ -33,7 +33,7 @@ public class TimeCallCountLimit implements LimitStrategy {
         if (queue == null) {
             synchronized (param.toString().intern()) {
                 if ((queue = store.get(param)) == null) {
-                    store.put(param, queue = new LinkedCyclicBoundedQueueImpl<>(count));
+                    store.put(param, queue = new ArrayCyclicBoundedQueue<>(count));
                 }
             }
         }
@@ -46,26 +46,20 @@ public class TimeCallCountLimit implements LimitStrategy {
      */
     private boolean includeThis(CyclicBoundedQueue<Long> queue) {
         long currentTimeMillis;
-        long tenBe = queue.putAndReturn(currentTimeMillis = System.currentTimeMillis()).orElse(0L);
-//        long interval = currentTimeMillis - tenBe;
-//        P.println("[{}]用户：{}，是否触发限流：{}， 当前时间：{}， 十次前的访问时间：{}，间隔：{}",
-//        Thread.currentThread().getName(), param, (currentTimeMillis - tenBe) < time, currentTimeMillis, tenBe, interval);
-        return (currentTimeMillis - tenBe) < time;
+        return (currentTimeMillis = System.currentTimeMillis()) - queue.putAndReturn(currentTimeMillis).orElse(0L) <= time;
+    }
+
+    private synchronized boolean noIncludeThis(CyclicBoundedQueue<Long> queue) {
+        long currentTimeMillis = System.currentTimeMillis();
+        if (queue.isNotFull() && queue.put(currentTimeMillis)) {
+            return false;
+        }
+        return !queue.ifFullConditionPut(l -> currentTimeMillis - l >= time, currentTimeMillis);
     }
 
     @Override
     public boolean callOn(Object param, boolean containThis) {
-        CyclicBoundedQueue<Long> queue = getQueue(param);
-        if (containThis) {
-            return includeThis(queue);
-        }
-
-        // 本次访问不参与计算
-        synchronized (queue) {
-            long currentTimeMillis = System.currentTimeMillis();
-            long interval = currentTimeMillis - queue.ifFullGetHead().orElse(0L);
-            return interval < time ? true : queue.putAndReturn(currentTimeMillis) == null;
-        }
+        return containThis ? includeThis(getQueue(param)) : noIncludeThis(getQueue(param));
     }
 
 }

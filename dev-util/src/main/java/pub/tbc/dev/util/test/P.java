@@ -37,6 +37,9 @@ public final class P {
         if (params != null && params.length > 0) {
             boolean have$ = false;
             for (Object param : params) {
+                if (param == null) {
+                    continue;
+                }
                 String p = param.toString();
                 if (p.contains("$")) {
                     have$ = true;

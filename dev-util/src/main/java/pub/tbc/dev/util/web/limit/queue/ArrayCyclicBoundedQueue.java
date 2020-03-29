@@ -2,6 +2,7 @@ package pub.tbc.dev.util.web.limit.queue;
 
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 /**
  * 基于数组的有界队列
@@ -43,14 +44,17 @@ public class ArrayCyclicBoundedQueue<E> implements CyclicBoundedQueue<E> {
             h = t = 0;
             count.incrementAndGet();
         } else if (count.get() < capacity) {
-            elements[t++] = e;
+            elements[++t] = e;
             count.incrementAndGet();
         } else {
-            t = h++;
-            if (h >= capacity) {
+            old = (E) elements[h];
+            elements[h] = e;
+            if (++h == capacity) {
                 h = 0;
             }
-            old = (E) elements[t];
+            if (++t == capacity) {
+                t = 0;
+            }
         }
         return Optional.ofNullable(old);
     }
@@ -71,8 +75,8 @@ public class ArrayCyclicBoundedQueue<E> implements CyclicBoundedQueue<E> {
     }
 
     @Override
-    public boolean ifMatchPut(Condition p, E e) {
-        throw new RuntimeException();
+    public synchronized boolean ifFullConditionPut(Predicate<E> p, E e) {
+        return isFull() && p.test((E) elements[h]) ? put(e) : false;
     }
 
 }

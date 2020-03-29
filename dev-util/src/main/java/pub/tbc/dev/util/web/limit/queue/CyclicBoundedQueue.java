@@ -1,6 +1,7 @@
 package pub.tbc.dev.util.web.limit.queue;
 
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * 有界队列：当队列满时添加新元素，移除 head 后将新元素加到队尾
@@ -11,6 +12,10 @@ import java.util.Optional;
 public interface CyclicBoundedQueue<E> {
 
     boolean isFull();
+
+    default boolean isNotFull() {
+        return !isFull();
+    }
 
     boolean put(E e);
 
@@ -24,14 +29,9 @@ public interface CyclicBoundedQueue<E> {
     /** 若队满返回队头元素，否则空 */
     Optional<E> ifFullGetHead();
 
-    /** 若条件成立，执行put操作 */
-    @Deprecated
-    boolean ifMatchPut(Condition p, E e);
+    /** 若队列满，且条件成立，执行put操作 */
+    boolean ifFullConditionPut(Predicate<E> p, E e);
 
-    @Deprecated
-    @FunctionalInterface
-    interface Condition {
-        boolean test();
-    }
+
 
 }

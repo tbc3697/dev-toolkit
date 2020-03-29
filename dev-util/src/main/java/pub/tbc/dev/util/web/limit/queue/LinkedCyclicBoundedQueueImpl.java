@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Predicate;
 
 /**
  * 基于单向链表的简单实现
@@ -77,8 +78,8 @@ public class LinkedCyclicBoundedQueueImpl<E> implements CyclicBoundedQueue<E> {
     }
 
     @Override
-    public synchronized boolean ifMatchPut(Condition p, E e) {
-        return p.test() ? put(e) : false;
+    public synchronized boolean ifFullConditionPut(Predicate<E> p, E e) {
+        return isFull() && p.test(h.value) ? put(e) : false;
     }
 
     @Override
