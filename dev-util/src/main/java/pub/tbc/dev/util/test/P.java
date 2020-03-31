@@ -28,7 +28,7 @@ public final class P {
     }
 
     /**
-     * Matcher做替换时replaceAll 或者 replaceFirst 时，会对字符串中的“$”符号敏感，得到不可预知结果
+     * Matcher做替换时(replaceAll 或者 replaceFirst)，会对字符串中的“$”符号敏感，得到不可预知结果
      *
      * @param msg
      * @param params
