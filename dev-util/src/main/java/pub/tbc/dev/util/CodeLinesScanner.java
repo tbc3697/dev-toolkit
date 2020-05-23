@@ -18,14 +18,6 @@ import java.util.stream.Collectors;
 public class CodeLinesScanner {
     private static final String SCAN_PATH = "scan.path";
 
-    static {
-        String scanPath = System.getProperty(SCAN_PATH);
-        System.setProperty(SCAN_PATH,
-                scanPath == null
-                        ? CodeLinesScanner.class.getResource("").getPath().replace("target/classes", "src/main/java")
-                        : scanPath);
-    }
-
     private static Optional<String> getScanPath(String[] args) {
         return Optional.of(Arrays.stream(args).findFirst().orElse(System.getProperty(SCAN_PATH)));
     }
