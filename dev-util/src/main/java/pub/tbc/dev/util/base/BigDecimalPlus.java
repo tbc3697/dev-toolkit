@@ -11,13 +11,16 @@ import java.util.function.BinaryOperator;
  * @author tbc  by 2018/8/28
  */
 public class BigDecimalPlus {
-    private BigDecimalPlus(BigDecimal value) {
-        this.value = value;
-    }
 
     private final int DEFAULT_ROUND = BigDecimal.ROUND_HALF_EVEN;
 
     private BigDecimal value;
+
+    private int roundingMode = DEFAULT_ROUND;
+
+    private BigDecimalPlus(BigDecimal value) {
+        this.value = value;
+    }
 
     public static BigDecimalPlus of(BigDecimal value) {
         if (value == null) {
@@ -30,11 +33,22 @@ public class BigDecimalPlus {
         return new BigDecimalPlus(value.orElse(BigDecimal.ZERO));
     }
 
+    /**
+     * default value = 0
+     *
+     * @param value
+     * @return
+     */
     public static BigDecimalPlus ofNullable(BigDecimal value) {
         if (value == null) {
             value = BigDecimal.ZERO;
         }
         return new BigDecimalPlus(value);
+    }
+
+    public BigDecimalPlus setRoundingMode(int roundingMode) {
+        this.roundingMode = roundingMode;
+        return this;
     }
 
     /**
@@ -93,6 +107,14 @@ public class BigDecimalPlus {
         return lte(new BigDecimal(target));
     }
 
+    public boolean eq(BigDecimal data) {
+        return value.compareTo(data) == 0;
+    }
+
+    public boolean eq(String data) {
+        return eq(new BigDecimal(data));
+    }
+
     public BigDecimalPlus addAll(BigDecimal... bs) {
         for (BigDecimal b : bs) {
             value = value.add(b);
@@ -118,12 +140,10 @@ public class BigDecimalPlus {
     }
 
     public BigDecimalPlus divide(BigDecimal... bs) {
-        return divide(8, DEFAULT_ROUND, bs);
+        return divide(8, roundingMode, bs);
     }
 
     public BigDecimalPlus divide(int scale, int round, BigDecimal... bs) {
         return reduce((b, a) -> b.divide(a, scale, round));
     }
-
-
 }
