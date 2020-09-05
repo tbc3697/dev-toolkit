@@ -13,7 +13,8 @@
         <module>lock</module>
         <module>fs-service</module>
         <module>cache</module>
-    </modules>
+		<module>invoker-toolkit</module>
+	</modules>
 
     <properties>
         <java.version>1.8</java.version>

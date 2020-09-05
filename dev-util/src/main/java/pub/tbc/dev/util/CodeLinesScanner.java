@@ -64,7 +64,7 @@ public class CodeLinesScanner {
 
             File file = new File(scanPath);
             List<File> files = getFileList(file, f -> !f.getPath().contains("test") && f.getName().endsWith(".java"));
-            P.println("java文件数量：{}", files == null ? 0 : files.size());
+            P.println("java文件数量（path 不含 'test'）：{}", files == null ? 0 : files.size());
             if (files == null) {
                 return;
             }
