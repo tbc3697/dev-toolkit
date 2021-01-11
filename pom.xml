@@ -14,6 +14,7 @@
         <module>fs-service</module>
         <module>cache</module>
 		<module>invoker-toolkit</module>
+		<module>ratelimit</module>
 	</modules>
 
     <properties>
@@ -32,7 +33,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.10</version>
+            <version>1.18.16</version>
         </dependency>
 
         <dependency>
