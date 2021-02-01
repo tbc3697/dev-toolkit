@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
 /**
- * 线程池构建器，暂只支持构建普通线程池
+ * 线程池构建器，暂只支持构建普通线程池，线程不安全，应在方法内使用
  *
  * @Author tbc by 2019/2/27 5:21 下午
  */
@@ -106,7 +106,7 @@ public class ExecutorBuilder {
 
         ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(core, max, k, unit, queue, t, handler);
         // Core threads must have nonzero keep alive times
-        if (keepAliveTime != 0 && allowCoreThreadTimeOut) {
+        if (k != 0 && allowCoreThreadTimeOut) {
             threadPoolExecutor.allowCoreThreadTimeOut(true);
         }
         return threadPoolExecutor;
