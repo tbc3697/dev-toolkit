@@ -3,6 +3,7 @@ package pub.tbc.dev.util.base;
 import com.sun.istack.internal.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -14,6 +15,7 @@ import java.util.function.Consumer;
  * @Author tbc by 2019/2/27 5:21 下午
  */
 @Data
+@Slf4j
 @Accessors(fluent = true)
 public class ExecutorBuilder {
     private static final String DEF_THREAD_NAME_PRE = "commonThread";
@@ -46,7 +48,7 @@ public class ExecutorBuilder {
     /**
      * 拒绝策略
      */
-    private RejectedExecutionHandler handler = new ThreadPoolExecutor.AbortPolicy();
+    private RejectedExecutionHandler rejectedHandler = new LoggingAbortPolicy();
     /**
      * 是否回收超时的 coreThread
      */
@@ -104,7 +106,7 @@ public class ExecutorBuilder {
         BlockingQueue queue = getQueue();
         ThreadFactory t = getThreadFactory();
 
-        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(core, max, k, unit, queue, t, handler);
+        ThreadPoolExecutor threadPoolExecutor = new ThreadPoolExecutor(core, max, k, unit, queue, t, rejectedHandler);
         // Core threads must have nonzero keep alive times
         if (k != 0 && allowCoreThreadTimeOut) {
             threadPoolExecutor.allowCoreThreadTimeOut(true);
@@ -132,6 +134,75 @@ public class ExecutorBuilder {
     public static ThreadPoolExecutor newSingleThreadExecutor(String threadNamePrefix) {
         return newFixedThreadPool(1, threadNamePrefix);
     }
+
+
+    // RejectedExecutor begin
+
+    public static LoggingAbortPolicy loggingAbortPolicy() {
+        return new LoggingAbortPolicy();
+    }
+    public static LoggingCallerRunsPolicy loggingCallerRunsPolicy() {
+        return new LoggingCallerRunsPolicy();
+    }
+
+    public static LoggingDiscardPolicy loggingDiscardPolicy() {
+        return new LoggingDiscardPolicy();
+    }
+    public static LoggingDiscardOldestPolicy loggingDiscardOldestPolicy() {
+        return new LoggingDiscardOldestPolicy();
+    }
+
+    private static class LoggingAbortPolicy implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            rejectedLogging(e, "抛出异常（Abort）");
+            throw new RejectedExecutionException(String.format(
+                    "Task %s rejected from %s", r.toString(), e.toString()
+            ));
+        }
+    }
+
+    private static class LoggingCallerRunsPolicy implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            rejectedLogging(e, "主线程执行任务（CallerRuns）");
+            if (!e.isShutdown()) {
+                r.run();
+            }
+        }
+    }
+
+    private static class LoggingDiscardPolicy implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            rejectedLogging(e, "丢弃任务（Discard）");
+        }
+    }
+
+    private static class LoggingDiscardOldestPolicy implements RejectedExecutionHandler {
+        @Override
+        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+            rejectedLogging(e, "丢弃最早的任务（DiscardOld）");
+            if (!e.isShutdown()) {
+                e.getQueue().poll();
+                e.execute(r);
+            }
+        }
+    }
+
+    private static void rejectedLogging(ThreadPoolExecutor e, String msg) {
+        log.error("[线程池满,拒绝策略：{}] 任务总数：{}，已完成数：{}, 队列大小：{}, 活动线程数：{}, 核心线程数：{}, isShutdown：{}",
+                msg,
+                e.getTaskCount(),
+                e.getCompletedTaskCount(),
+                e.getQueue().size(),
+                e.getActiveCount(),
+                e.getCorePoolSize(),
+                e.isShutdown()
+        );
+    }
+
+    // RejectedExecutor end
 
     public static void main(String[] args) throws InterruptedException {
         ThreadPoolExecutor test = new ExecutorBuilder()
@@ -169,3 +240,4 @@ public class ExecutorBuilder {
         test.shutdown();
     }
 }
+
