@@ -10,22 +10,16 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 /**
+ * 与 Optional 的区别：这个是可变的，有 set 方法
+ *
  * @author tbc on 2016/9/24 14:20.
  */
 public class Holder<T> {
-
-    private static final Holder<?> EMPTY = new Holder<>();
 
     private T value;
 
     private Holder() {
         this.value = null;
-    }
-
-    public static <T> Holder<T> empty() {
-        @SuppressWarnings("unchecked")
-        Holder<T> t = (Holder<T>) EMPTY;
-        return t;
     }
 
     private Holder(T value) {
@@ -34,6 +28,10 @@ public class Holder<T> {
 
     public static <T> Holder<T> of(T value) {
         return new Holder<>(value);
+    }
+
+    public static <T> Holder<T> empty() {
+        return new Holder<>();
     }
 
     public static <T> Holder<T> ofNullable(T value) {
@@ -63,28 +61,17 @@ public class Holder<T> {
 
     public Holder<T> filter(Predicate<? super T> predicate) {
         Objects.requireNonNull(predicate);
-        if (!isPresent())
-            return this;
-        else
-            return predicate.test(value) ? this : empty();
+        return isEmpty() ? this : predicate.test(value) ? this : empty();
     }
 
     public <U> Holder<U> map(Function<? super T, ? extends U> mapper) {
         Objects.requireNonNull(mapper);
-        if (!isPresent())
-            return empty();
-        else {
-            return Holder.ofNullable(mapper.apply(value));
-        }
+        return isEmpty() ? empty() : Holder.ofNullable(mapper.apply(value));
     }
 
     public <U> Holder<U> flatMap(Function<? super T, Holder<U>> mapper) {
         Objects.requireNonNull(mapper);
-        if (!isPresent())
-            return empty();
-        else {
-            return Objects.requireNonNull(mapper.apply(value));
-        }
+        return isEmpty() ? empty() : Objects.requireNonNull(mapper.apply(value));
     }
 
     public <R> Stream<R> stream() {
@@ -112,9 +99,8 @@ public class Holder<T> {
     public <X extends Throwable> T orElseThrow(Supplier<? extends X> exceptionSupplier) throws X {
         if (value != null) {
             return value;
-        } else {
-            throw exceptionSupplier.get();
         }
+        throw exceptionSupplier.get();
     }
 
     @Override

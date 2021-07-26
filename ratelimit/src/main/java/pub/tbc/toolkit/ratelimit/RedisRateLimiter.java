@@ -59,14 +59,28 @@ public class RedisRateLimiter extends TokenBucketRateLimiter {
      * @return
      */
     private String lockScript() {
-        return "local currentTokenCount = redis.call(\"GET\", \"KEY[1]\");" +
-                "local newCount = 0;" +
-                "if (currentTokenCount > ARGS[1]) {" +
-                "   currentTokenCount - ARGS[1];" +
-                "}" +
-                "// 计算" +
-                "" +
-                "" +
-                "";
+        return "-- 存放上一次请求后剩余数量的KEY\n" +
+                "local count_key = KEYS[1]\n" +
+                "-- 存放上一次请求时间\n" +
+                "local time_key = KEYS[2]\n" +
+                "\n" +
+                "-- 本次所需令牌数量\n" +
+                "local requiredCount = ARGS[1]\n" +
+                "-- 令牌产生速度，个/毫秒\n" +
+                "local velocity = ARGS[2]\n" +
+                "\n" +
+                "-- 剩余令牌数量\n" +
+                "local currentTokenCount = redis.call(\"GET\", \"KEY[1]\")\n" +
+                "if (currentTokenCount == nil) {\n" +
+                "    currentTokenCount = 0\n" +
+                "}\n" +
+                "\n" +
+                "-- 新的数量\n" +
+                "local newCount = 0\n" +
+                "if (currentTokenCount >= requiredCount) {\n" +
+                "    newCount = currentTokenCount - requiredCount;\n" +
+                "}\n" +
+                "\n" +
+                "-- local time = 当前时间";
     }
 }
