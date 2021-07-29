@@ -14,13 +14,11 @@ import java.util.concurrent.locks.ReentrantLock;
 @Slf4j
 public class OddEvenNumPrint {
     public static void main(String[] args) {
-        Thread oddThread = new Thread("odd");
-        Thread evenThread = new Thread("even");
         test1();
     }
 
     private static void test1() {
-        OddEvenPrinter printer = new LockOddEvenPrinter(0, 1000, 1);
+        OddEvenPrinter printer = new VolatileOddEvenPrinter(0, 50, 1);
         ExecutorService executorService = Executors.newFixedThreadPool(2);
         executorService.execute(printer::print);
         executorService.execute(printer::print);
@@ -67,6 +65,30 @@ public class OddEvenNumPrint {
             });
         }
 
+    }
+
+    @Slf4j
+    static class VolatileOddEvenPrinter implements OddEvenPrinter {
+        private volatile int value;
+        private final int step;
+        private int limit;
+
+
+        public VolatileOddEvenPrinter(int value, int limit, int step) {
+            this.value = value;
+            this.limit = limit;
+            this.step = step;
+        }
+
+        @Override
+        public void print() {
+            while (value <= limit) {
+                // volatile read
+                int v = value;
+                log.info("print : {}", v);
+                value++;
+            }
+        }
     }
 
 

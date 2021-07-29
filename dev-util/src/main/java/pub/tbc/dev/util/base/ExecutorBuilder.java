@@ -48,7 +48,7 @@ public class ExecutorBuilder {
     /**
      * 拒绝策略
      */
-    private RejectedExecutionHandler rejectedHandler = new LoggingAbortPolicy();
+    private RejectedExecutionHandler rejectedHandler = loggingAbortPolicy();
     /**
      * 是否回收超时的 coreThread
      */
@@ -114,6 +114,31 @@ public class ExecutorBuilder {
         return threadPoolExecutor;
     }
 
+
+    // build factory
+
+    public static ExecutorBuilder buildFixedThreadPool(int threadCount, ThreadFactory factory) {
+        return new ExecutorBuilder().threadFactory(factory).coreThread(threadCount).maxThread(threadCount);
+    }
+
+    public static ExecutorBuilder buildFixedThreadPool(int threadCount, String threadNamePrefix) {
+        return buildFixedThreadPool(threadCount, threadNamePrefix, null);
+    }
+
+    public static ExecutorBuilder buildFixedThreadPool(int threadCount, String threadNamePrefix, String threadNameSuffix) {
+        return new ExecutorBuilder()
+                .threadNamePrefix(threadNamePrefix)
+                .threadNameSuffix(threadNameSuffix)
+                .coreThread(threadCount)
+                .maxThread(threadCount);
+    }
+
+    public static ExecutorBuilder buildSingleThreadExecutor(String threadNamePrefix) {
+        return buildFixedThreadPool(1, threadNamePrefix);
+    }
+
+    ////// ************* ///////
+
     public static ThreadPoolExecutor newFixedThreadPool(int threadCount, ThreadFactory factory) {
         return new ExecutorBuilder().threadFactory(factory).coreThread(threadCount).maxThread(threadCount).build();
     }
@@ -138,56 +163,36 @@ public class ExecutorBuilder {
 
     // RejectedExecutor begin
 
-    public static LoggingAbortPolicy loggingAbortPolicy() {
-        return new LoggingAbortPolicy();
-    }
-    public static LoggingCallerRunsPolicy loggingCallerRunsPolicy() {
-        return new LoggingCallerRunsPolicy();
-    }
-
-    public static LoggingDiscardPolicy loggingDiscardPolicy() {
-        return new LoggingDiscardPolicy();
-    }
-    public static LoggingDiscardOldestPolicy loggingDiscardOldestPolicy() {
-        return new LoggingDiscardOldestPolicy();
-    }
-
-    private static class LoggingAbortPolicy implements RejectedExecutionHandler {
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    public static RejectedExecutionHandler loggingAbortPolicy() {
+        return (Runnable r, ThreadPoolExecutor e) -> {
             rejectedLogging(e, "抛出异常（Abort）");
             throw new RejectedExecutionException(String.format(
                     "Task %s rejected from %s", r.toString(), e.toString()
             ));
-        }
+        };
     }
 
-    private static class LoggingCallerRunsPolicy implements RejectedExecutionHandler {
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    public static RejectedExecutionHandler loggingCallerRunsPolicy() {
+        return (Runnable r, ThreadPoolExecutor e) -> {
             rejectedLogging(e, "主线程执行任务（CallerRuns）");
             if (!e.isShutdown()) {
                 r.run();
             }
-        }
+        };
     }
 
-    private static class LoggingDiscardPolicy implements RejectedExecutionHandler {
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
-            rejectedLogging(e, "丢弃任务（Discard）");
-        }
+    public static RejectedExecutionHandler loggingDiscardPolicy() {
+        return (Runnable r, ThreadPoolExecutor e) -> rejectedLogging(e, "丢弃任务（Discard）");
     }
 
-    private static class LoggingDiscardOldestPolicy implements RejectedExecutionHandler {
-        @Override
-        public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    public static RejectedExecutionHandler loggingDiscardOldestPolicy() {
+        return (Runnable r, ThreadPoolExecutor e) -> {
             rejectedLogging(e, "丢弃最早的任务（DiscardOld）");
             if (!e.isShutdown()) {
                 e.getQueue().poll();
                 e.execute(r);
             }
-        }
+        };
     }
 
     private static void rejectedLogging(ThreadPoolExecutor e, String msg) {
@@ -201,6 +206,46 @@ public class ExecutorBuilder {
                 e.isShutdown()
         );
     }
+
+
+    // rejected class
+
+    // private static class LoggingAbortPolicy implements RejectedExecutionHandler {
+    //     @Override
+    //     public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    //         rejectedLogging(e, "抛出异常（Abort）");
+    //         throw new RejectedExecutionException(String.format(
+    //                 "Task %s rejected from %s", r.toString(), e.toString()
+    //         ));
+    //     }
+    // }
+    // private static class LoggingCallerRunsPolicy implements RejectedExecutionHandler {
+    //     @Override
+    //     public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    //         rejectedLogging(e, "主线程执行任务（CallerRuns）");
+    //         if (!e.isShutdown()) {
+    //             r.run();
+    //         }
+    //     }
+    // }
+    //
+    // private static class LoggingDiscardPolicy implements RejectedExecutionHandler {
+    //     @Override
+    //     public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    //         rejectedLogging(e, "丢弃任务（Discard）");
+    //     }
+    // }
+    //
+    // private static class LoggingDiscardOldestPolicy implements RejectedExecutionHandler {
+    //     @Override
+    //     public void rejectedExecution(Runnable r, ThreadPoolExecutor e) {
+    //         rejectedLogging(e, "丢弃最早的任务（DiscardOld）");
+    //         if (!e.isShutdown()) {
+    //             e.getQueue().poll();
+    //             e.execute(r);
+    //         }
+    //     }
+    // }
 
     // RejectedExecutor end
 
