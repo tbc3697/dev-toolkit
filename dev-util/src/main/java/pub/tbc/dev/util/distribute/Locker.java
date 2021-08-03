@@ -1,4 +1,6 @@
-package pub.tbc.dev.util.base;
+package pub.tbc.dev.util.distribute;
+
+import pub.tbc.dev.util.base.Sleeps;
 
 import java.util.Objects;
 import java.util.concurrent.locks.Lock;

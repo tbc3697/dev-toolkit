@@ -12,14 +12,14 @@ import java.util.stream.Collectors;
  * 基于一致性哈希的节点选择（不带虚拟节点）
  */
 @Slf4j
-public abstract class ConsistencyHashSelector implements NodeSelector {
+public abstract class AbstractConsistencyHashSelector implements NodeSelector {
 
     private int HASH_POINT = (1 << 32) - 1;
 
     protected TreeMap<Integer, String> nodes = new TreeMap<>();
 
-    protected ConsistencyHashSelector(Collection<String> nodes) {
-        this.nodes.putAll(nodes.stream().collect(Collectors.toMap(String::hashCode, Function.identity())));
+    protected AbstractConsistencyHashSelector(Collection<String> nodes) {
+        this.nodes.putAll(nodes.stream().collect(Collectors.toMap(this::indexOf, Function.identity())));
     }
 
     /**

@@ -1,5 +1,5 @@
 import org.junit.Test;
-import pub.tbc.dev.util.base.Locker;
+import pub.tbc.dev.util.distribute.Locker;
 
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
