@@ -8,6 +8,4 @@ import lombok.Data;
 @Data
 public class InvokerResult<T> {
     private T result;
-
-
 }
