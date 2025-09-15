@@ -1,6 +1,5 @@
 package pub.tbc.dev.util.base;
 
-import com.sun.istack.internal.NotNull;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import lombok.extern.slf4j.Slf4j;
@@ -72,7 +71,7 @@ public class ExecutorBuilder {
             private AtomicInteger threadCounter = new AtomicInteger(0);
 
             @Override
-            public Thread newThread(@NotNull Runnable r) {
+            public Thread newThread(Runnable r) {
                 return new Thread(r, getThreadName(threadCounter));
             }
         };

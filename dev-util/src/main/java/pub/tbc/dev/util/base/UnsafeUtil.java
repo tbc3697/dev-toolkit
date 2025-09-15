@@ -20,12 +20,12 @@ public class UnsafeUtil {
     }
 
     public static void main(String[] args) throws IllegalAccessException {
-        AtomicInteger computer = new AtomicInteger(0);
+        AtomicInteger counter = new AtomicInteger(0);
         for (; ; ) {
             Unsafe unsafe = getUnsafe();
             long l = 1024 * 1024;
             long memoryAdd = unsafe.allocateMemory(l * l);
-            System.out.println(String.format("第 %d 次申请内存，地址：%d", computer.incrementAndGet(), memoryAdd));
+            System.out.println(String.format("第 %d 次申请内存，地址：%d", counter.incrementAndGet(), memoryAdd));
         }
     }
 }
